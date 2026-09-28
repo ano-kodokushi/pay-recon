@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Minimal POM for the installed surefire-junit-platform shim artifact.
+
+  Deliberately has NO <dependencies>: the official provider's POM drags in
+  maven-core/maven-plugin-api/commons-io versions that are absent from this
+  offline local repository. Surefire resolves the provider's runtime classpath
+  from its own pinned coordinates (org.junit.platform:junit-platform-launcher /
+  -engine) independently of this POM, so no dependencies are needed here.
+
+  The provider class is compiled separately with javac (see build-shim.ps1);
+  this POM exists only to let `mvn install:install-file` register the artifact.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.surefire</groupId>
+  <artifactId>surefire-junit-platform</artifactId>
+  <version>3.2.5</version>
+  <packaging>jar</packaging>
+  <name>surefire-junit-platform (offline shim)</name>
+  <description>Offline replacement for the missing surefire JUnit Platform provider</description>
+</project>

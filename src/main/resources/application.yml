@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pay-recon
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:pay_recon}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&rewriteBatchedStatements=true
+    # 口令与库名一律走环境变量；默认值只是本机 demo 用的弱口令。
+    # 真实部署请用环境变量覆盖，不要把真实口令写回本文件。
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:000000}
+    hikari:
+      # 并发测试需要足够连接；场景 1 是 10 线程同时下单
+      maximum-pool-size: 32
+      minimum-idle: 4
+      connection-timeout: 10000
+      pool-name: pay-recon-pool
+  # 建表走离带外脚本（scripts/init-db.ps1），不要让 Spring 启动时重放 DDL：
+  # pay_flow 是只追加的审计表，见 schema.sql 顶部说明。
+  sql:
+    init:
+      mode: never
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    # 让控制台看得到真正执行的 SQL，便于并发验收时取证
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+
+app:
+  # ---- 回调验签（mock HMAC，禁止跳过）----
+  callback:
+    secret: pay-recon-mock-hmac-secret
+    # 我方回调地址，渠道 mock 的 /mock/channel/notify 会往这里发
+    self-url: http://127.0.0.1:8080/api/pay/callback
+  # ---- 任务3 主动查询兜底 ----
+  query-job:
+    # 定时任务开关。测试里用 app.query-job.enabled=false 关掉调度，
+    # 再手动调 QueryJobService.runOnce() 做确定性验证。
+    enabled: true
+    fixed-delay-ms: 5000
+    # 只捞 updated_at 超过这个分钟数还停在 PAYING 的单；测试用 1 分钟
+    stale-minutes: 1
+    batch-size: 200
+  # ---- 对账 ----
+  reconcile:
+    # 我方账单/渠道账单按日比对，单账户
+    account-no: ACC-001
+
+logging:
+  level:
+    root: INFO
+    com.payrecon: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"

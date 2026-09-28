@@ -1,0 +1,38 @@
+# ---- 构建产物 ----
+target/
+*.jar
+*.war
+*.class
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+
+# ---- 日志与运行期文件 ----
+*.log
+logs/
+hs_err_pid*.log
+replay_pid*.log
+
+# ---- 测试与报告输出（报告是文档，代码是代码；surefire 输出不入库）----
+surefire-reports/
+*-output.txt
+*.dump
+*.dumpstream
+
+# ---- OS ----
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ---- 本地环境覆盖（不要把本机数据库口令提交上去）----
+src/main/resources/application-local.yml
+application-local.yml
+*.local.yml
+.env
