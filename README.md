@@ -244,3 +244,14 @@ mvn -o test
 | POST | `/mock/channel/control/statement?merchantOrderNo=&status=&amount=` | 故障注入：注入渠道对账单行 |
 | POST | `/mock/channel/control/reset` | 清空渠道 Mock 全部内存状态 |
 | GET | `/mock/channel/control/snapshot` | 渠道 Mock 当前状态快照 |
+
+---
+
+## 7. 授权
+
+本项目采用 **MIT License**，详见 [LICENSE](LICENSE)。你可以自由使用、修改、分发，
+包括用于商业用途，只需保留版权声明。
+
+> 说明：本工程是一个**演示/练习性质**的最小闭环实现，未经过生产环境验证。
+> 其中的渠道对接是 mock、回调验签是简化版 HMAC，**不可直接用于真实资金业务**。
+> 数据库连接口令等敏感项一律通过环境变量注入（见 §5），仓库内不含任何真实凭据。
